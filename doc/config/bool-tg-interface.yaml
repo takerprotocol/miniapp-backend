@@ -1,0 +1,81 @@
+server:
+  port: 8888
+  name: bool-tg-interface
+spring:
+  application:
+    name: bool-tg-interface
+  ## 数据库配置
+  datasource:
+    dynamic:
+      primary: busin
+      #严格匹配数据源,默认false. true未匹配到指定数据源时抛异常,false使用默认数据源
+      strict: false
+      datasource:
+        busin:
+          url: jdbc:p6spy:mysql://127.0.0.1:3306/bool-bot
+          username: root
+          password: password
+          driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+          hikari: # 全局hikariCP参数，所有值和默认保持一致。(现已支持的参数如下,不清楚含义不要乱设置)
+            connection-timeout: 3000
+            max-lifetime: 1800000
+            max-pool-size: 120
+            min-idle: 10
+            connection-test-query: select 1
+  data:
+    redis:
+      database: 12
+      host: 127.0.0.1
+      port: 6379
+      password: password
+      timeout: 5000
+      lettuce:
+        pool:
+          # 连接池最大连接数(使用负数表示没有限制),默认8
+          max-active: 50
+          #最大阻塞等待时间(负数表示没限制)
+          max-wait: 5000
+          #最大空闲
+          max-idle: 50
+          #最小空闲
+          min-idle: 20
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+mybatis-plus:
+  mapper-locations: classpath:**/*Mapper.xml
+#MyBatis使用pageHelper分页
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+
+# BOOL 配置
+bool:
+  #  bot 配置
+  family:
+    # bot token
+    bot-token: ""
+    # 小程序 url
+    mini-app-url: ""
+  premium:
+    reward: 30
+  og:
+    reward: 30
+  og-regex: 50
+  # mpc 钱包的 js 服务，用来生成地址、签名等
+  mpc-js-service:
+    url: ""
+
+  # 用户邀请码规则
+  inviter-code:
+    source: "1234567890ABCDEFGHJKMPKRSTVWXYZ"
+    length: 5
+  # 邀请奖励
+  inviter-reward:
+    l1-ratio: 0.05
+    l2-ratio: 0.03
+  create-task:
+    enable: true
+    key-set: "creat-task-1"

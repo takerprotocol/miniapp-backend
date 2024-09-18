@@ -9,7 +9,7 @@
 <a id=用户注册2284> </a>
 ### 基本信息
 
-**Path：** /user/register
+**Path：** /boolUser/register
 
 **Method：** POST
 
@@ -48,7 +48,7 @@
 <a id=邀请记录2284> </a>
 ### 基本信息
 
-**Path：** /user/inviter-records
+**Path：** /boolUser/inviter-records
 
 **Method：** GET
 
@@ -80,7 +80,7 @@
 <a id=排行榜2284> </a>
 ### 基本信息
 
-**Path：** /user/reward:rank
+**Path：** /boolUser/reward:rank
 
 **Method：** GET
 
@@ -110,7 +110,7 @@
 <a id=邀请人数排行榜(总榜)2284> </a>
 ### 基本信息
 
-**Path：** /user/inviter/rank/full
+**Path：** /boolUser/inviter/rank/full
 
 **Method：** GET
 
@@ -140,7 +140,7 @@
 <a id=邀请人数排行榜(周榜)2284> </a>
 ### 基本信息
 
-**Path：** /user/inviter/rank/week
+**Path：** /boolUser/inviter/rank/week
 
 **Method：** GET
 
@@ -170,7 +170,7 @@
 <a id=严格模式获取用户信息2284> </a>
 ### 基本信息
 
-**Path：** /user/user/strict
+**Path：** /boolUser/boolUser/strict
 
 **Method：** POST
 

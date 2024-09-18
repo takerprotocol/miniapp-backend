@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.abmatrix.bool.tg.dao.mapper.UserInvitationRelationMapper">
+
+	<resultMap
+		id="inviterRankMap"
+		type="com.abmatrix.bool.tg.common.model.vo.InvitationRankVo">
+		<result
+			column="inviter_id"
+			property="userId" />
+		<result
+			column="Number"
+			property="inviterNumbers" />
+		<result
+			column="Integral"
+			property="inviterIntegral" />
+	</resultMap>
+
+	<select
+		id="queryRankByInviters"
+		resultMap="inviterRankMap">
+		SELECT inviter_id,
+		Number,
+		sum(reward_value) Integral
+		FROM(SELECT
+		inviter_id,
+		COUNT(invitee_id)Number
+		FROM bool_user_invitation_relation
+		WHERE invitation_time BETWEEN #{startTime} AND #{endTime}
+		GROUP BY
+		inviter_id)as invite_table
+		LEFT JOIN `bool_user_reward_record` AS
+		reward_table on
+		invite_table.inviter_id = reward_table.user_id
+		WHERE
+		reward_table.reward_type = 'INVITATION'
+		AND reward_time BETWEEN
+		#{startTime} AND #{endTime}
+		GROUP BY inviter_id
+		<if test="orderType != null and orderType == 'Number'">
+			ORDER BY Number desc
+		</if>
+		<if test="orderType != null and orderType == 'Integral'">
+			ORDER BY Integral desc
+		</if>
+
+	</select>
+
+
+
+	<select
+		id="queryLevel2InvitationRelations"
+		resultType="com.abmatrix.bool.tg.dao.entity.BoolUserInvitationRelation">
+		select
+		t1.invitee_id as inviteeId,t1.invitation_time as
+		invitationTime,
+		t1.inviter_id AS inviterId
+		from
+		bool_user_invitation_relation t1
+		inner join
+		(
+		SELECT
+		invitee_id
+		from
+		bool_user_invitation_relation
+		where
+		inviter_id = #{userId}) t2 on
+		t1.inviter_id = t2.invitee_id
+		order by
+		id desc LIMIT #{offset},#{limit}
+	</select>
+
+
+
+
+	<select
+		id="queryLevel2InvitationRelationsCount"
+		parameterType="java.lang.Long"
+		resultType="java.lang.Integer">
+		select
+		count(id)
+		from
+		bool_user_invitation_relation t1
+		inner
+		join
+		(
+		SELECT
+		invitee_id
+		from
+		bool_user_invitation_relation
+		where
+		inviter_id
+		= #{userId}) t2 on
+		t1.inviter_id = t2.invitee_id
+	</select>
+
+	<select
+			id="currentWeekRelations"
+			resultType="com.abmatrix.bool.tg.dao.entity.BoolUserInvitationRelation">
+		select
+			inviter_id AS inviterId,
+			invitee_id AS inviteeId,
+			invitation_time AS invitationTime
+		from
+			bool_user_invitation_relation t1
+		where
+				t1.invitation_time >=
+				#{thisMondayAtEight}
+	</select>
+
+
+
+	<select
+			id="weekRelationsByRange"
+			resultType="com.abmatrix.bool.tg.dao.entity.BoolUserInvitationRelation">
+		select
+			inviter_id AS inviterId,
+			invitee_id AS inviteeId,
+			invitation_time
+					   AS invitationTime
+		from
+			bool_user_invitation_relation t1
+		where
+				t1.invitation_time >=
+				#{thisMondayAtEight}
+		  AND
+		<![CDATA[
+			t1.invitation_time < #{nextMondayAtEight}
+		]]>
+	</select>
+
+</mapper>

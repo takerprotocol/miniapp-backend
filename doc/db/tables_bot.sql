@@ -74,28 +74,6 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for bool_assignment_version
--- ----------------------------
-DROP TABLE IF EXISTS `bool_assignment_version`;
-CREATE TABLE `bool_assignment_version` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `version` bigint(20) NOT NULL DEFAULT '0' COMMENT '版本号',
-  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
-  `create_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
-  `update_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '修改人',
-  `f_assignment_version` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '任务版本',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_version` (`f_assignment_version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='任务版本表，后台运营每次新增任务想要提醒用户，可刷新此版本号，记录累加';
-
--- ----------------------------
--- Records of bool_assignment_version
--- ----------------------------
-BEGIN;
-COMMIT;
-
--- ----------------------------
 -- Table structure for bool_caculate_rank_offset
 -- ----------------------------
 DROP TABLE IF EXISTS `bool_caculate_rank_offset`;

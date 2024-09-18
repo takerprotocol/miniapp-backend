@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.abmatrix.bool.tg.dao.mapper.UserMapper">
+
+
+
+	<select
+		id="queryUserRank"
+		resultType="java.lang.Long">
+		select
+		rank
+		from
+		(
+		<![CDATA[
+		select
+		sub.*,
+		@rank := @rank + 1 AS rank
+		from
+		(
+		SELECT
+		sum(reward_value) rewardValue,
+		user_id
+		from
+		bool_user_reward_record
+		group by
+		user_id
+		order by
+		rewardValue desc ,
+		user_id asc) as sub,
+		(
+		SELECT @rank := 0) r
+		]]>
+		) as total where
+		total.user_id=#{userId}
+	</select>
+
+
+
+	<update
+			id="batchUpdateUserRewardForFull"
+			parameterType="java.util.List">
+		<foreach
+				collection="list"
+				item="reward"
+				index="index"
+				separator=";">
+			UPDATE bool_user_user
+			<set>
+				reward_amount = #{reward.rewardValue}
+			</set>
+			WHERE id = #{reward.userId}
+		</foreach>
+	</update>
+
+
+
+	<update
+			id="batchUpdateUserRewardForIncrease"
+			parameterType="java.util.List">
+		<foreach
+				collection="list"
+				item="reward"
+				index="index"
+				separator=";">
+			UPDATE bool_user_user
+			<set>
+				reward_amount = reward_amount + #{reward.rewardValue}
+			</set>
+			WHERE id = #{reward.userId}
+		</foreach>
+	</update>
+
+	<select id="querUserList" resultType="Long">
+		select id from bool_user_user WHERE id > #{userId} limit 1000
+	</select>
+
+
+</mapper>
