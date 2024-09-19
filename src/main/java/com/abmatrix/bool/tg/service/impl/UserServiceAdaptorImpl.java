@@ -45,7 +45,7 @@ public class UserServiceAdaptorImpl implements UserServiceAdaptor {
 	 * 计算用户排名奖励列表偏移量数据接口
 	 */
 	@Autowired
-	private BoolCaculateRankOffsetMapper boolCaculateRankOffsetMapper;
+	private BoolCalculateRankOffsetMapper boolCalculateRankOffsetMapper;
 	/**
 	 * 用户mapper
 	 */
@@ -106,8 +106,8 @@ public class UserServiceAdaptorImpl implements UserServiceAdaptor {
 		}
 		for (BoolUserInviteCountWeekSettlementFlow settle : settleList) {
 			LambdaQueryWrapper<BoolUserInviteCountWeekSettlementFlow> settleQuery = Wrappers.lambdaQuery();
-			Long timeStamp = settleList.get(NumberConstants.ZERO).getCaculateTimestamp();
-			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCaculateTimestamp, timeStamp);
+			Long timeStamp = settleList.get(NumberConstants.ZERO).getCalculateTimestamp();
+			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCalculateTimestamp, timeStamp);
 			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getUserId, settle.getUserId());
 			settleQuery.select(BoolUserInviteCountWeekSettlementFlow::getId);
 			BoolUserInviteCountWeekSettlementFlow existFlow = boolUserInviteCountWeekSettlementFlowMapper
@@ -127,10 +127,10 @@ public class UserServiceAdaptorImpl implements UserServiceAdaptor {
 		if (CollectionUtil.isEmpty(totalRewardList) || maxRewardId == null || maxRewardId <= NumberConstants.ZERO) {
 			return;
 		}
-		LambdaUpdateWrapper<BoolCaculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
-		offsetUpdate.set(BoolCaculateRankOffset::getLatestRewardId, maxRewardId);
-		offsetUpdate.eq(BoolCaculateRankOffset::getId, NumberConstants.ONE);
-		boolCaculateRankOffsetMapper.update(offsetUpdate);
+		LambdaUpdateWrapper<BoolCalculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
+		offsetUpdate.set(BoolCalculateRankOffset::getLatestRewardId, maxRewardId);
+		offsetUpdate.eq(BoolCalculateRankOffset::getId, NumberConstants.ONE);
+		boolCalculateRankOffsetMapper.update(offsetUpdate);
 		List<List<BoolUserRewardRecord>> totalRewardListList = Lists.partition(totalRewardList, NumberConstants.THOUSAND);
 		for (List<BoolUserRewardRecord> totalRewardChildList : totalRewardListList) {
 			if (isFull) {
@@ -149,10 +149,10 @@ public class UserServiceAdaptorImpl implements UserServiceAdaptor {
 		if (CollectionUtil.isEmpty(snapList) || maxInviteId == null || maxInviteId <= NumberConstants.ZERO) {
 			return;
 		}
-		LambdaUpdateWrapper<BoolCaculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
-		offsetUpdate.set(BoolCaculateRankOffset::getLatestRewardId, maxInviteId);
-		offsetUpdate.eq(BoolCaculateRankOffset::getId, NumberConstants.TWO);
-		boolCaculateRankOffsetMapper.update(offsetUpdate);
+		LambdaUpdateWrapper<BoolCalculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
+		offsetUpdate.set(BoolCalculateRankOffset::getLatestRewardId, maxInviteId);
+		offsetUpdate.eq(BoolCalculateRankOffset::getId, NumberConstants.TWO);
+		boolCalculateRankOffsetMapper.update(offsetUpdate);
 		List<List<BoolUserInviteCountSnapshot>> snapListList = Lists.partition(snapList, NumberConstants.THOUSAND);
 		for (List<BoolUserInviteCountSnapshot> childSnapList : snapListList) {
 			if (isFull) {

@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class BoolCaculateRankOffset extends BaseSqlDO {
+public class BoolCalculateRankOffset extends BaseSqlDO {
 
 	/**
 	 * 最终偏移量ID

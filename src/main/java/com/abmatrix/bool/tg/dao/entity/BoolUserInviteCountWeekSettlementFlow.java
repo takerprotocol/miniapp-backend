@@ -78,8 +78,8 @@ public class BoolUserInviteCountWeekSettlementFlow extends Model<BoolUserInviteC
     /**
      * 业务时间
      */
-    @TableField("f_caculate_timestamp")
-    private Long caculateTimestamp;
+    @TableField("f_calculate_timestamp")
+    private Long calculateTimestamp;
 
     /**
      * 对应快照记录ID

@@ -43,7 +43,7 @@ public class RedisKeyConstants {
 	/**
 	 * 用户邀请排行榜计算分布式锁
 	 */
-	public static final String USER_FULL_INVITE_RANK_CACULATE_LOCK = "bool:tg:user:full:invite:rank:caculate";
+	public static final String USER_FULL_INVITE_RANK_CALCULATE_LOCK = "bool:tg:user:full:invite:rank:calculate";
 
 	/**
 	 * 用户全量邀请排名zset
@@ -53,7 +53,7 @@ public class RedisKeyConstants {
 	/**
 	 * 用户周邀请排行榜计算分布式锁
 	 */
-	public static final String USER_WEEKLY_INVITE_RANK_CACULATE_LOCK = "bool:tg:user:weekly:invite:rank:caculate";
+	public static final String USER_WEEKLY_INVITE_RANK_CALCULATE_LOCK = "bool:tg:user:weekly:invite:rank:calculate";
 
 	/**
 	 * 用户周邀请排行榜加载分布式锁
@@ -66,7 +66,7 @@ public class RedisKeyConstants {
 	/**
 	 * 计算用户排名分布式锁
 	 */
-	public static final String USER_POINT_RANK_CACULATE_LOCK = "bool:tg:user:point:rank:caculate";
+	public static final String USER_POINT_RANK_CALCULATE_LOCK = "bool:tg:user:point:rank:calculate";
 	/**
 	 * 周榜清算锁头
 	 */

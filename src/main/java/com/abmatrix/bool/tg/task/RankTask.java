@@ -86,7 +86,7 @@ public class RankTask implements CommandLineRunner {
      *
      */
     @Autowired
-    private BoolCaculateRankOffsetMapper boolCaculateRankOffsetMapper;
+    private BoolCalculateRankOffsetMapper boolCalculateRankOffsetMapper;
     /**
      * 用户接口适配器
      */
@@ -134,7 +134,7 @@ public class RankTask implements CommandLineRunner {
                     .newScheduledThreadPool(NumberConstants.ONE);
             rewardRankSnapExecutorService.scheduleWithFixedDelay(() -> {
                 try {
-                    caculateUserPointRank();
+                    calculateUserPointRank();
                 } catch (Exception e) {
                     log.info("排行榜任务完成异常: [{}]", e.getMessage());
                 }
@@ -143,11 +143,11 @@ public class RankTask implements CommandLineRunner {
             ScheduledExecutorService inviteRankSnapExecutorService = Executors
                     .newScheduledThreadPool(NumberConstants.ONE);
             inviteRankSnapExecutorService.scheduleWithFixedDelay(() -> {
-                RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_FULL_INVITE_RANK_CACULATE_LOCK);
+                RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_FULL_INVITE_RANK_CALCULATE_LOCK);
                 try {
                     if (lock.tryLock(0, 5, TimeUnit.MINUTES)) {
                         try {
-                            caculateUserInviteRank();
+                            calculateUserInviteRank();
                             createFullInviteRankIndex();
                         } catch (Exception e) {
                             log.info("邀请排行榜任务完成异常: [{}]", e.getMessage());
@@ -165,7 +165,7 @@ public class RankTask implements CommandLineRunner {
                     .newScheduledThreadPool(NumberConstants.ONE);
             weekRankSnapExecutorService.scheduleWithFixedDelay(() -> {
                 try {
-                    RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_WEEKLY_INVITE_RANK_CACULATE_LOCK);
+                    RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_WEEKLY_INVITE_RANK_CALCULATE_LOCK);
                     if (lock.tryLock(0, 1, TimeUnit.MINUTES)) {
                         try {
                             weekInvite();
@@ -210,13 +210,13 @@ public class RankTask implements CommandLineRunner {
      * 计算用户排名
      */
     @SneakyThrows
-    private void caculateUserPointRank() {
-        RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_POINT_RANK_CACULATE_LOCK);
+    private void calculateUserPointRank() {
+        RLock lock = redissonClient.getFairLock(RedisKeyConstants.USER_POINT_RANK_CALCULATE_LOCK);
         if (lock.tryLock(0, 1, TimeUnit.MINUTES)) {
             try {
                 StopWatch watch = StopWatch.createStarted();
                 // 修改对应用户的奖励值
-                BoolCaculateRankOffset offsetRecord = boolCaculateRankOffsetMapper.selectById(NumberConstants.ONE);
+                BoolCalculateRankOffset offsetRecord = boolCalculateRankOffsetMapper.selectById(NumberConstants.ONE);
                 Boolean isFull = Boolean.TRUE;
                 LambdaQueryWrapper<BoolUserRewardRecord> rewardQuery = Wrappers.lambdaQuery();
                 rewardQuery.select(BoolUserRewardRecord::getId, BoolUserRewardRecord::getUserId,
@@ -358,11 +358,11 @@ public class RankTask implements CommandLineRunner {
      * 计算全量用户邀请排行
      */
     @SneakyThrows
-    private void caculateUserInviteRank() {
+    private void calculateUserInviteRank() {
         try {
             StopWatch watch = StopWatch.createStarted();
             // 修改对应用户的奖励值
-            BoolCaculateRankOffset offsetRecord = boolCaculateRankOffsetMapper.selectById(NumberConstants.TWO);
+            BoolCalculateRankOffset offsetRecord = boolCalculateRankOffsetMapper.selectById(NumberConstants.TWO);
             Boolean isFull = Boolean.TRUE;
             LambdaQueryWrapper<BoolUserInvitationRelation> inviteQuery = Wrappers.lambdaQuery();
             inviteQuery.select(BoolUserInvitationRelation::getId, BoolUserInvitationRelation::getInviterId,
@@ -405,8 +405,8 @@ public class RankTask implements CommandLineRunner {
             List<BoolUserInviteCountSnapshot> snapList = Lists.newArrayListWithCapacity(CollectionUtil.size(vertexSet));
             LocalDateTime now = LocalDateTime.now();
             for (Long userId : vertexSet) {
-                long levelOneCount = caculateDownlineAmounts(userId, graph, NumberConstants.ONE);
-                long levelTwoCount = caculateDownlineAmounts(userId, graph, NumberConstants.TWO);
+                long levelOneCount = calculateDownlineAmounts(userId, graph, NumberConstants.ONE);
+                long levelTwoCount = calculateDownlineAmounts(userId, graph, NumberConstants.TWO);
                 snap = new BoolUserInviteCountSnapshot();
                 snap.setCreateUser(userId);
                 snap.setUpdateUser(userId);
@@ -440,8 +440,8 @@ public class RankTask implements CommandLineRunner {
      * @param level
      * @return
      */
-    private Long caculateDownlineAmounts(Long userId, Graph<Long, DefaultEdge> graph, Integer level) {
-        return caculateDownlineAmounts(userId, graph, NumberConstants.TWO, null, null);
+    private Long calculateDownlineAmounts(Long userId, Graph<Long, DefaultEdge> graph, Integer level) {
+        return calculateDownlineAmounts(userId, graph, NumberConstants.TWO, null, null);
     }
 
     /**
@@ -453,7 +453,7 @@ public class RankTask implements CommandLineRunner {
      * @param inviteTimeMap
      * @return
      */
-    private Long caculateDownlineAmounts(Long userId, Graph<Long, DefaultEdge> graph, Integer level,
+    private Long calculateDownlineAmounts(Long userId, Graph<Long, DefaultEdge> graph, Integer level,
                                          final Map<Long, Long> inviteTimeMap, Map<Long, LocalDateTime> relationInviteeTimeMap) {
         if (userId == null || level > NumberConstants.TWO || level <= NumberConstants.ZERO) {
             return NumberConstants.ZERO_LONG;
@@ -590,12 +590,12 @@ public class RankTask implements CommandLineRunner {
      * 初始化构建周排行计算任务
      */
 //	@SneakyThrows
-//	private void initWeekInviteCaculateTask() {
+//	private void initWeekInviteCalculateTask() {
 //		Scheduler scheduler = StdSchedulerFactory.getDefaultScheduler();
 //		Map<String, Object> diMap = Maps.newHashMap();
 //		diMap.put("applicationContext", applicationContext);
 //		JobDataMap jobDataMap = new JobDataMap(diMap);
-//		JobDetail job = JobBuilder.newJob(WeekSnapCaculateJob.class).setJobData(jobDataMap)
+//		JobDetail job = JobBuilder.newJob(WeekSnapCalculateJob.class).setJobData(jobDataMap)
 //				.withIdentity("weekInviteJob", "bool-tg-interface-job").build();
 //		// 定义 Cron Trigger
 //		// 0 0 8 ? * 1
@@ -651,9 +651,9 @@ public class RankTask implements CommandLineRunner {
             Map<Long, LocalDateTime> relationGroup = relationList.stream().collect(
                     Collectors.toMap(BoolUserInvitationRelation::getInviteeId, BoolUserInvitationRelation::getInvitationTime));
             for (Long userId : existInviters) {
-                long levelOneCount = caculateDownlineAmounts(userId, graph, NumberConstants.ONE, inviteTimeMap,
+                long levelOneCount = calculateDownlineAmounts(userId, graph, NumberConstants.ONE, inviteTimeMap,
                         relationGroup);
-                long levelTwoCount = caculateDownlineAmounts(userId, graph, NumberConstants.TWO, inviteTimeMap,
+                long levelTwoCount = calculateDownlineAmounts(userId, graph, NumberConstants.TWO, inviteTimeMap,
                         relationGroup);
                 Long amount = levelOneCount + levelTwoCount;
                 if (amount <= NumberConstants.ZERO) {
@@ -668,7 +668,7 @@ public class RankTask implements CommandLineRunner {
                 snap.setAmount(amount);
                 snap.setAmount1(levelOneCount);
                 snap.setAmount2(levelTwoCount);
-                snap.setCaculateTimestamp(timestamp);
+                snap.setCalculateTimestamp(timestamp);
                 Long latestInviteTime = inviteTimeMap.get(userId);
                 snap.setLatestInvitationTimestamp(latestInviteTime);
                 snapList.add(snap);
@@ -701,7 +701,7 @@ public class RankTask implements CommandLineRunner {
                         Map<Long, LocalDateTime> tmpRelationGroup = relationList.stream().collect(Collectors.toMap(
                                 BoolUserInvitationRelation::getInviteeId, BoolUserInvitationRelation::getInvitationTime));
                         relationGroup.putAll(tmpRelationGroup);
-                        long levelTwoCount = caculateDownlineAmounts(topUserId, graph, NumberConstants.TWO,
+                        long levelTwoCount = calculateDownlineAmounts(topUserId, graph, NumberConstants.TWO,
                                 inviteTimeMap, relationGroup);
                         Long amount = levelTwoCount;
                         if (amount <= NumberConstants.ZERO) {
@@ -716,7 +716,7 @@ public class RankTask implements CommandLineRunner {
                         snap.setAmount(amount);
                         snap.setAmount1(NumberConstants.ZERO_LONG);
                         snap.setAmount2(levelTwoCount);
-                        snap.setCaculateTimestamp(timestamp);
+                        snap.setCalculateTimestamp(timestamp);
                         Long latestInviteTime = inviteTimeMap.get(topUserId);
                         snap.setLatestInvitationTimestamp(latestInviteTime);
                         snapList.add(snap);
@@ -747,10 +747,10 @@ public class RankTask implements CommandLineRunner {
         try {
             LocalDateTime now = LocalDateTime.now();
             Timestamp lastTimeStamp = new Timestamp(timestamp);
-            LocalDateTime caculateMondayAtEight = lastTimeStamp.toLocalDateTime();
-            LocalDateTime caculateNextMondayAtEight = caculateMondayAtEight.plusDays(7);
+            LocalDateTime calculateMondayAtEight = lastTimeStamp.toLocalDateTime();
+            LocalDateTime calculateNextMondayAtEight = calculateMondayAtEight.plusDays(7);
             List<BoolUserInvitationRelation> relationList = userInvitationRelationMapper
-                    .weekRelationsByRange(caculateMondayAtEight, caculateNextMondayAtEight);
+                    .weekRelationsByRange(calculateMondayAtEight, calculateNextMondayAtEight);
             log.info("计算周邀请排行,查询邀请记录耗时{}ms,数据共有{}条", watch.getTime(), CollectionUtil.size(relationList));
             if (CollectionUtil.isEmpty(relationList)) {
                 return Lists.newArrayList();
@@ -779,9 +779,9 @@ public class RankTask implements CommandLineRunner {
             Map<Long, LocalDateTime> relationGroup = relationList.stream().collect(
                     Collectors.toMap(BoolUserInvitationRelation::getInviteeId, BoolUserInvitationRelation::getInvitationTime));
             for (Long userId : existInviters) {
-                long levelOneCount = caculateDownlineAmounts(userId, graph, NumberConstants.ONE, inviteTimeMap,
+                long levelOneCount = calculateDownlineAmounts(userId, graph, NumberConstants.ONE, inviteTimeMap,
                         relationGroup);
-                long levelTwoCount = caculateDownlineAmounts(userId, graph, NumberConstants.TWO, inviteTimeMap,
+                long levelTwoCount = calculateDownlineAmounts(userId, graph, NumberConstants.TWO, inviteTimeMap,
                         relationGroup);
                 Long amount = levelOneCount + levelTwoCount;
                 if (amount <= NumberConstants.ZERO) {
@@ -796,7 +796,7 @@ public class RankTask implements CommandLineRunner {
                 snap.setAmount(amount);
                 snap.setAmount1(levelOneCount);
                 snap.setAmount2(levelTwoCount);
-                snap.setCaculateTimestamp(timestamp);
+                snap.setCalculateTimestamp(timestamp);
                 Long latestInviteTime = inviteTimeMap.get(userId);
                 snap.setLatestInvitationTimestamp(latestInviteTime);
                 snapList.add(snap);
@@ -829,7 +829,7 @@ public class RankTask implements CommandLineRunner {
                         Map<Long, LocalDateTime> tmpRelationGroup = relationList.stream().collect(Collectors.toMap(
                                 BoolUserInvitationRelation::getInviteeId, BoolUserInvitationRelation::getInvitationTime));
                         relationGroup.putAll(tmpRelationGroup);
-                        long levelTwoCount = caculateDownlineAmounts(topUserId, graph, NumberConstants.TWO,
+                        long levelTwoCount = calculateDownlineAmounts(topUserId, graph, NumberConstants.TWO,
                                 inviteTimeMap, relationGroup);
                         Long amount = levelTwoCount;
                         if (amount <= NumberConstants.ZERO) {
@@ -844,7 +844,7 @@ public class RankTask implements CommandLineRunner {
                         snap.setAmount(amount);
                         snap.setAmount1(NumberConstants.ZERO_LONG);
                         snap.setAmount2(levelTwoCount);
-                        snap.setCaculateTimestamp(timestamp);
+                        snap.setCalculateTimestamp(timestamp);
                         Long latestInviteTime = inviteTimeMap.get(topUserId);
                         snap.setLatestInvitationTimestamp(latestInviteTime);
                         snapList.add(snap);

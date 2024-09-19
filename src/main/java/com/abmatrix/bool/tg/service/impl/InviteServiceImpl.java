@@ -298,8 +298,8 @@ public class InviteServiceImpl implements InviteService {
 		Set<Long> customInfoIdQuerySet = Sets.newHashSet();
 		rankList = rankList.stream().map(rank -> {
 			Integer rankNo = rankAtom.incrementAndGet();
-			Integer rankNoCaculated = (pageNoCacl - 1) * pageSizeCacl + rankNo;
-			String rankNoStr = String.valueOf(rankNoCaculated);
+			Integer rankNoCalculated = (pageNoCacl - 1) * pageSizeCacl + rankNo;
+			String rankNoStr = String.valueOf(rankNoCalculated);
 			rank.setRank(rankNoStr);
 			String value = formatAmount(new BigDecimal(rank.getRewardValue()));
 			rank.setRewardValue(value);
@@ -308,7 +308,7 @@ public class InviteServiceImpl implements InviteService {
 			rank.setUsername(userName);
 
 			// 添加个人url返回
-			if (rankNoCaculated <= NumberConstants.TWEENTY && rankNoCaculated > NumberConstants.ZERO) {
+			if (rankNoCalculated <= NumberConstants.TWEENTY && rankNoCalculated > NumberConstants.ZERO) {
 				Long userId = rank.getUserId();
 				if (userId != null) {
 					customInfoIdQuerySet.add(userId);

@@ -3,11 +3,11 @@ package com.abmatrix.bool.tg.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.abmatrix.bool.tg.common.constants.NumberConstants;
 import com.abmatrix.bool.tg.common.enuma.WeekSettleStatusEnum;
-import com.abmatrix.bool.tg.dao.entity.BoolCaculateRankOffset;
+import com.abmatrix.bool.tg.dao.entity.BoolCalculateRankOffset;
 import com.abmatrix.bool.tg.dao.entity.BoolUserInviteCountSnapshot;
 import com.abmatrix.bool.tg.dao.entity.BoolUserInviteCountWeekSettlementFlow;
 import com.abmatrix.bool.tg.dao.entity.BoolUserInviteCountWeekSnapshot;
-import com.abmatrix.bool.tg.dao.mapper.BoolCaculateRankOffsetMapper;
+import com.abmatrix.bool.tg.dao.mapper.BoolCalculateRankOffsetMapper;
 import com.abmatrix.bool.tg.dao.mapper.BoolUserInviteCountSnapshotMapper;
 import com.abmatrix.bool.tg.dao.mapper.BoolUserInviteCountWeekSettlementFlowMapper;
 import com.abmatrix.bool.tg.dao.mapper.BoolUserInviteCountWeekSnapshotMapper;
@@ -55,7 +55,7 @@ public class RankServiceAdaptorImpl implements RankServiceAdaptor {
 	 * 计算用户排名奖励列表偏移量数据接口
 	 */
 	@Autowired
-	private BoolCaculateRankOffsetMapper boolCaculateRankOffsetMapper;
+	private BoolCalculateRankOffsetMapper boolCalculateRankOffsetMapper;
 
 	@Override
 	@SneakyThrows
@@ -65,10 +65,10 @@ public class RankServiceAdaptorImpl implements RankServiceAdaptor {
 		if (CollectionUtil.isEmpty(snapList) || maxInviteId == null || maxInviteId <= NumberConstants.ZERO) {
 			return;
 		}
-		LambdaUpdateWrapper<BoolCaculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
-		offsetUpdate.set(BoolCaculateRankOffset::getLatestRewardId, maxInviteId);
-		offsetUpdate.eq(BoolCaculateRankOffset::getId, NumberConstants.TWO);
-		boolCaculateRankOffsetMapper.update(offsetUpdate);
+		LambdaUpdateWrapper<BoolCalculateRankOffset> offsetUpdate = Wrappers.lambdaUpdate();
+		offsetUpdate.set(BoolCalculateRankOffset::getLatestRewardId, maxInviteId);
+		offsetUpdate.eq(BoolCalculateRankOffset::getId, NumberConstants.TWO);
+		boolCalculateRankOffsetMapper.update(offsetUpdate);
 		List<List<BoolUserInviteCountSnapshot>> snapListList = Lists.partition(snapList, NumberConstants.THOUSAND);
 		for (List<BoolUserInviteCountSnapshot> childSnapList : snapListList) {
 			if (isFull) {
@@ -100,9 +100,9 @@ public class RankServiceAdaptorImpl implements RankServiceAdaptor {
 		if (CollectionUtil.isEmpty(settleList)) {
 			return;
 		}
-		Long timeStamp = settleList.get(NumberConstants.ZERO).getCaculateTimestamp();
+		Long timeStamp = settleList.get(NumberConstants.ZERO).getCalculateTimestamp();
 		LambdaQueryWrapper<BoolUserInviteCountWeekSettlementFlow> settleQuery = Wrappers.lambdaQuery();
-		settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCaculateTimestamp, timeStamp);
+		settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCalculateTimestamp, timeStamp);
 		settleQuery.select(BoolUserInviteCountWeekSettlementFlow::getId);
 		List<BoolUserInviteCountWeekSettlementFlow> existFlowList = boolUserInviteCountWeekSettlementFlowMapper
 				.selectList(settleQuery);
@@ -112,7 +112,7 @@ public class RankServiceAdaptorImpl implements RankServiceAdaptor {
 		}
 		for (BoolUserInviteCountWeekSettlementFlow settle : settleList) {
 			settleQuery = Wrappers.lambdaQuery();
-			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCaculateTimestamp, timeStamp);
+			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getCalculateTimestamp, timeStamp);
 			settleQuery.eq(BoolUserInviteCountWeekSettlementFlow::getUserId, settle.getUserId());
 			settleQuery.select(BoolUserInviteCountWeekSettlementFlow::getId);
 			BoolUserInviteCountWeekSettlementFlow existFlow = boolUserInviteCountWeekSettlementFlowMapper

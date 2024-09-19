@@ -85,7 +85,7 @@ public class WeekSnapSettleJob implements Job {
                         settle.setUpdateUser(userId);
                         settle.setUserId(userId);
                         settle.setAmount(resp.getAmount());
-                        settle.setCaculateTimestamp(lastimestamp);
+                        settle.setCalculateTimestamp(lastimestamp);
                         settle.setSnapshotId(resp.getSnapId());
                         settle.setAward(NumberConstants.ZERO_STR);
 

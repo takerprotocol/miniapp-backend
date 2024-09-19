@@ -77,8 +77,8 @@ public class BoolUserInviteCountWeekSnapshot extends Model<BoolUserInviteCountWe
 	/**
 	 * 业务时间
 	 */
-	@TableField("f_caculate_timestamp")
-	private Long caculateTimestamp;
+	@TableField("f_calculate_timestamp")
+	private Long calculateTimestamp;
 
 	/**
 	 * 一级邀请人数

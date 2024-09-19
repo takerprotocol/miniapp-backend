@@ -74,10 +74,10 @@ BEGIN;
 COMMIT;
 
 -- ----------------------------
--- Table structure for bool_caculate_rank_offset
+-- Table structure for bool_calculate_rank_offset
 -- ----------------------------
-DROP TABLE IF EXISTS `bool_caculate_rank_offset`;
-CREATE TABLE `bool_caculate_rank_offset` (
+DROP TABLE IF EXISTS `bool_calculate_rank_offset`;
+CREATE TABLE `bool_calculate_rank_offset` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
   `f_latest_reward_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '最新奖励id',
   `version` bigint(20) NOT NULL DEFAULT '0' COMMENT '版本号',
@@ -88,7 +88,7 @@ CREATE TABLE `bool_caculate_rank_offset` (
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='计算排名任务偏移量';
 
 -- ----------------------------
--- Records of bool_caculate_rank_offset
+-- Records of bool_calculate_rank_offset
 -- ----------------------------
 BEGIN;
 COMMIT;
@@ -229,14 +229,14 @@ CREATE TABLE `bool_user_invite_count_week_settlement_flow` (
   `update_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '修改人',
   `f_user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
   `f_amount` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '邀请人数量1级+2级',
-  `f_caculate_timestamp` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '业务时间',
+  `f_calculate_timestamp` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '业务时间',
   `f_snapshot_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '对应快照记录ID',
   `f_award` varchar(100) DEFAULT '0' COMMENT '奖励',
   `f_rank` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '排名 1-10',
   `f_draw_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '对应抽奖记录ID，周结算奖也放入抽奖记录中，方便提币',
   `f_status` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '发放状态  0未发放  1已发放，此时会有drawid，2已领取，提币触发',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uniq_settle` (`f_caculate_timestamp`,`f_user_id`),
+  UNIQUE KEY `uniq_settle` (`f_calculate_timestamp`,`f_user_id`),
   UNIQUE KEY `uniq_snap` (`f_snapshot_id`),
   KEY `idx_draw` (`f_draw_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COMMENT='周榜结算流水';
