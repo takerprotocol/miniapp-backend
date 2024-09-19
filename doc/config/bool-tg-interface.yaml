@@ -56,9 +56,9 @@ bool:
   #  bot 配置
   family:
     # bot token
-    bot-token: ""
+    bot-token: "7061791412:AAGDV-0PIbtLsJfAGfcWuVpFiheiQmzGGgM"
     # 小程序 url
-    mini-app-url: ""
+    mini-app-url: "https://main.d34bttjipbixnf.amplifyapp.com"
   premium:
     reward: 30
   og:
