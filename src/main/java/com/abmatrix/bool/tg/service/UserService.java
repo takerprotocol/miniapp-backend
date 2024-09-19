@@ -281,12 +281,12 @@ public class UserService {
         boolean og = tgIdStart < ogRex;
 
         // 计算 账号年限奖励、 Telegram 付费会员奖励、OG 老用户奖励
-        long ageScore = 10L;
+        long ageScore = 20L;
         if (year > 0) {
             if (year == 1) {
-                ageScore = 100L;
+                ageScore = 60L;
             } else {
-                ageScore = year * 10 + 100;
+                ageScore = year * 20 + 40;
             }
         }
 
