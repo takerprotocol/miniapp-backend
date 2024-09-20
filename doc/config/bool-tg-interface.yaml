@@ -66,7 +66,7 @@ bool:
   og-regex: 50
   # mpc 钱包的 js 服务，用来生成地址、签名等
   mpc-js-service:
-    url: ""
+    url: "http://localhost:5000"
 
   # 用户邀请码规则
   inviter-code:
@@ -74,8 +74,8 @@ bool:
     length: 5
   # 邀请奖励
   inviter-reward:
-    l1-ratio: 0.05
-    l2-ratio: 0.03
+    l1-ratio: 0.18
+    l2-ratio: 0.08
   create-task:
     enable: true
     key-set: "creat-task-1"
