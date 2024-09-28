@@ -24,10 +24,10 @@ spring:
             connection-test-query: select 1
   data:
     redis:
-      database: 12
+      database: 1
       host: 127.0.0.1
       port: 6379
-      password: password
+      password:
       timeout: 5000
       lettuce:
         pool:
@@ -74,8 +74,8 @@ bool:
     length: 5
   # 邀请奖励
   inviter-reward:
-    l1-ratio: 0.18
-    l2-ratio: 0.08
+    l1-ratio: 0.05
+    l2-ratio: 0.03
   create-task:
     enable: true
     key-set: "creat-task-1"

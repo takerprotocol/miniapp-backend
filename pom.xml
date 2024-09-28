@@ -38,9 +38,9 @@
 		<telegram.version>7.7.1</telegram.version>
 		<validation.version>2.0.1.Final</validation.version>
 		<!-- docker -->
-		<jib.version>3.3.1</jib.version>
-		<docker.repo>${docker.repo}</docker.repo>
-		<docker.customTag>custom</docker.customTag>
+<!--		<jib.version>3.3.1</jib.version>-->
+<!--		<docker.repo>${docker.repo}</docker.repo>-->
+<!--		<docker.customTag>custom</docker.customTag>-->
 		<!-- docker end-->
 	</properties>
 	<dependencyManagement>
@@ -248,105 +248,105 @@
 					<mainClass>com.abmatrix.bool.tg.ApplicationStart</mainClass>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.google.cloud.tools</groupId>
-				<artifactId>jib-maven-plugin</artifactId>
-				<version>${jib.version}</version>
-				<configuration>
-					<from>
-						<image>
-							${docker.repo}/jdk17
-						</image>
-					</from>
-					<to>
-						<image>
-							${docker.repo}/${project.artifactId}
-						</image>
-						<tags>
-							<tag>latest</tag>
-							<tag>${profile.active}</tag>
-							<tag>${project.version}-${profile.active}</tag>
-							<tag>${docker.customTag}</tag>
-						</tags>
-					</to>
-					<!--container 节点用来设置容器的属性，例如对外暴露的端口、jvm 参数等 -->
-					<container>
-						<jvmFlags>
-							<!--jdk17特性兼容-->
-							<jvmFlag>
-								--add-opens=java.base/java.lang=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.math=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.lang.invoke=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.io=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.security=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.util=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.management/javax.management=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.naming/javax.naming=ALL-UNNAMED
-							</jvmFlag>
-							<jvmFlag>
-								--add-opens=java.base/java.time=ALL-UNNAMED
-							</jvmFlag>
-							<!-- jvm 内存参数 -->
-							<jvmFlag>${jvm.Xms}</jvmFlag>
-							<jvmFlag>${jvm.Xmx}</jvmFlag>
-							<!-- 设置时区 -->
-							<jvmFlag>-Duser.timezone=Asia/Shanghai</jvmFlag>
-							<!-- 配置随机数生成的种子, 加速 Tomcat 启动 -->
-							<jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>
-							<!-- 设置 profile -->
-							<jvmFlag>-Dspring.profiles.active=${profile.active}</jvmFlag>
-							<!-- 开启 debug 端口 -->
-							<jvmFlag>
-								-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
-							</jvmFlag>
-							<!-- 打开bootstrap属性读取功能-->
-							<jvmFlag>-Dspring.cloud.bootstrap.enabled=true</jvmFlag>
-							<!-- 开启zgc-->
-							<jvmFlag>-XX:+UseZGC</jvmFlag>
-							<!-- 元空间增大-->
-							<jvmFlag>-XX:MaxMetaspaceSize=1G</jvmFlag>
-							<!-- 直接内存增大 -->
-							<jvmFlag>-XX:MaxDirectMemorySize=512M</jvmFlag>
-						</jvmFlags>
-						<!-- 要暴露的端口 -->
-						<ports>
-							<port>8888</port>
-							<port>5005</port>
-						</ports>
-					</container>
-					<allowInsecureRegistries>true</allowInsecureRegistries>
-				</configuration>
-				<!-- 解决 maven 工程是父子结构的 mvn compile -->
-				<!-- 把 jib 绑定到 maven 命令中-->
-				<executions>
-					<execution>
-						<phase>deploy</phase>
-						<goals>
-							<goal>build</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>com.google.cloud.tools</groupId>-->
+<!--				<artifactId>jib-maven-plugin</artifactId>-->
+<!--				<version>${jib.version}</version>-->
+<!--				<configuration>-->
+<!--					<from>-->
+<!--						<image>-->
+<!--							${docker.repo}/jdk17-->
+<!--						</image>-->
+<!--					</from>-->
+<!--					<to>-->
+<!--						<image>-->
+<!--							${docker.repo}/${project.artifactId}-->
+<!--						</image>-->
+<!--						<tags>-->
+<!--							<tag>latest</tag>-->
+<!--							<tag>${profile.active}</tag>-->
+<!--							<tag>${project.version}-${profile.active}</tag>-->
+<!--							<tag>${docker.customTag}</tag>-->
+<!--						</tags>-->
+<!--					</to>-->
+<!--					&lt;!&ndash;container 节点用来设置容器的属性，例如对外暴露的端口、jvm 参数等 &ndash;&gt;-->
+<!--					<container>-->
+<!--						<jvmFlags>-->
+<!--							&lt;!&ndash;jdk17特性兼容&ndash;&gt;-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.lang=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/sun.reflect.generics.reflectiveObjects=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.math=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-exports=java.naming/com.sun.jndi.ldap=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.lang.invoke=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.io=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.security=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.util=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.management/javax.management=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.naming/javax.naming=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							<jvmFlag>-->
+<!--								&#45;&#45;add-opens=java.base/java.time=ALL-UNNAMED-->
+<!--							</jvmFlag>-->
+<!--							&lt;!&ndash; jvm 内存参数 &ndash;&gt;-->
+<!--							<jvmFlag>${jvm.Xms}</jvmFlag>-->
+<!--							<jvmFlag>${jvm.Xmx}</jvmFlag>-->
+<!--							&lt;!&ndash; 设置时区 &ndash;&gt;-->
+<!--							<jvmFlag>-Duser.timezone=Asia/Shanghai</jvmFlag>-->
+<!--							&lt;!&ndash; 配置随机数生成的种子, 加速 Tomcat 启动 &ndash;&gt;-->
+<!--							<jvmFlag>-Djava.security.egd=file:/dev/./urandom</jvmFlag>-->
+<!--							&lt;!&ndash; 设置 profile &ndash;&gt;-->
+<!--							<jvmFlag>-Dspring.profiles.active=${profile.active}</jvmFlag>-->
+<!--							&lt;!&ndash; 开启 debug 端口 &ndash;&gt;-->
+<!--							<jvmFlag>-->
+<!--								-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005-->
+<!--							</jvmFlag>-->
+<!--							&lt;!&ndash; 打开bootstrap属性读取功能&ndash;&gt;-->
+<!--							<jvmFlag>-Dspring.cloud.bootstrap.enabled=true</jvmFlag>-->
+<!--							&lt;!&ndash; 开启zgc&ndash;&gt;-->
+<!--							<jvmFlag>-XX:+UseZGC</jvmFlag>-->
+<!--							&lt;!&ndash; 元空间增大&ndash;&gt;-->
+<!--							<jvmFlag>-XX:MaxMetaspaceSize=1G</jvmFlag>-->
+<!--							&lt;!&ndash; 直接内存增大 &ndash;&gt;-->
+<!--							<jvmFlag>-XX:MaxDirectMemorySize=512M</jvmFlag>-->
+<!--						</jvmFlags>-->
+<!--						&lt;!&ndash; 要暴露的端口 &ndash;&gt;-->
+<!--						<ports>-->
+<!--							<port>8888</port>-->
+<!--							<port>5005</port>-->
+<!--						</ports>-->
+<!--					</container>-->
+<!--					<allowInsecureRegistries>true</allowInsecureRegistries>-->
+<!--				</configuration>-->
+<!--				&lt;!&ndash; 解决 maven 工程是父子结构的 mvn compile &ndash;&gt;-->
+<!--				&lt;!&ndash; 把 jib 绑定到 maven 命令中&ndash;&gt;-->
+<!--				<executions>-->
+<!--					<execution>-->
+<!--						<phase>deploy</phase>-->
+<!--						<goals>-->
+<!--							<goal>build</goal>-->
+<!--						</goals>-->
+<!--					</execution>-->
+<!--				</executions>-->
+<!--			</plugin>-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
