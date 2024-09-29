@@ -79,3 +79,11 @@ bool:
   create-task:
     enable: true
     key-set: "creat-task-1"
+  # rpc 配置
+  web3:
+    rpc: ""
+## stake配置
+stake:
+  contracts:
+    mining:
+      address: ""
