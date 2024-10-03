@@ -83,6 +83,8 @@ CREATE TABLE `bool_calculate_rank_offset` (
   `version` bigint(20) NOT NULL DEFAULT '0' COMMENT '版本号',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+  `create_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+  `update_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '修改人',
   `f_type` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '类别 1积分排行计算逻辑  2全量邀请排行计算逻辑',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COMMENT='计算排名任务偏移量';
