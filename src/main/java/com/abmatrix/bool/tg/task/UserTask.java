@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 @Component
-@Profile({"prod", "test"})
+//@Profile({"prod", "test"})
 public class UserTask {
 
     @Value("${bool.create-task.enable}")
@@ -69,14 +69,14 @@ public class UserTask {
             return;
         }
 
-        log.info("开始进行地址创建, key: [{}]", key);
+//        log.info("开始进行地址创建, key: [{}]", key);
 
         try {
 
             List<String> userIdList = redisTemplate.opsForList().leftPop(key, 200);
 
             if (null == userIdList || userIdList.isEmpty()) {
-                log.info("key: [{}] 没有需要处理的用户地址", key);
+//                log.info("key: [{}] 没有需要处理的用户地址", key);
                 return;
             }
 
@@ -101,12 +101,13 @@ public class UserTask {
 
                                 var evmAddressInfo = jobService.genEvmAddressInfo(user.getId());
                                 if (StringUtils.hasText(evmAddressInfo.getKey())) {
-
+                                    log.info("用户地址: [{}] 创建 [{}] 成功", user.getId(), evmAddressInfo.getKey());
                                     user.setAddress(evmAddressInfo.getKey());
                                     keyFragmentInfoList.add(evmAddressInfo.getValue());
                                 } else {
                                     // 没生成成功重新放回 redis 中
                                     redisTemplate.opsForList().leftPush(key, String.valueOf(user.getId()));
+                                    log.info("用户地址: [{}] 创建失败", user.getId());
                                 }
                             }
                     )).join();
@@ -140,7 +141,7 @@ public class UserTask {
             log.info(watch.prettyPrint());
 
         } catch (Exception e) {
-            log.warn("key: [{}] 创建地址异常: [{}]", key, e.getMessage());
+            log.error("key: [{}] 创建地址失败", key, e);
         }
     }
 

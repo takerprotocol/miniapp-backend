@@ -123,9 +123,11 @@ public class UserService {
     public String register(UserRegisterReq req) {
 
         JSONObject userInfo = checkAndParseData(req.getData(), req.getHash());
-        if (userInfo.isEmpty()) {
-            return null;
-        }
+//        if (userInfo.isEmpty()) {
+//            return null;
+//        }
+        Assert.isFalse(userInfo.isEmpty(), "User identity verification failed.req={}",
+                JSONObject.toJSONString(req));
 
         try {
 
@@ -134,11 +136,11 @@ public class UserService {
             String username = userInfo.getString("username");
             Optional<BoolUser> inviterOpt = userDao.lambdaQuery().eq(BoolUser::getInvitationCode, inviterCode).oneOpt();
 
-            if (inviterOpt.isEmpty()) {
-                // 没有邀请码或者邀请码乱填不让注册
-                log.info("No inviter can not register");
-                return null;
-            }
+//            if (inviterOpt.isEmpty()) {
+//                // 没有邀请码或者邀请码乱填不让注册
+//                log.info("No inviter can not register");
+//                return "No inviter can not register";
+//            }
 
             // 1. 获取用户信息 与邀请人注册信息
             if (StringUtils.hasText(username)) {
@@ -146,7 +148,7 @@ public class UserService {
                 Optional<BoolUser> userOpt = userDao.lambdaQuery().eq(BoolUser::getUserTgId, tgId).oneOpt();
                 if (userOpt.isPresent()) {
                     log.info("Already register");
-                    return null;
+                    return "Already register";
                 }
 
                 long userId = IdUtil.getSnowflakeNextId();
@@ -164,7 +166,11 @@ public class UserService {
                 boolUser.setLastName(userInfo.getString("last_name"));
                 boolUser.setInvitationCode(generateInvitationCode());
 
-                Long inviterId = inviterOpt.get().getId();
+//                Long inviterId = inviterOpt.get().getId();
+                Long inviterId = 0L;
+                if (inviterOpt.isPresent()) {
+                    inviterId = inviterOpt.get().getId();
+                }
 
                 // 保存邀请关系
                 BoolUserInvitationRelation relation = new BoolUserInvitationRelation();
@@ -205,6 +211,7 @@ public class UserService {
                         try {
                             listRedisClient.lpush(key, userId);
                             success = true;
+                            log.info("用户注册信息userId={}插入地址生成队列key={}", userId, key);
                         } catch (Exception e) {
                             String errMsg = StrUtil.format("注册用户插入地址生成队列异常userId={}", userId);
                             log.error(errMsg, e);
@@ -214,12 +221,16 @@ public class UserService {
 
                 }
                 return String.valueOf(userId);
+            } else {
+                log.info("Register user error:[{}]", username);
+                return "error username";
             }
 
         } catch (Exception e) {
             log.info("Register user error:[{}]-[{}]", JSONObject.toJSONString(req), e.getMessage());
+            return e.getMessage();
         }
-        return null;
+//        return null;
     }
 
     private List<BoolUserRewardRecord> getInviteRewardList(Long inviterId, long userId, Long score) {
@@ -418,9 +429,12 @@ public class UserService {
             }
         }
         Optional<BoolUser> opt = userDao.lambdaQuery().eq(BoolUser::getUserTgId, tgId).oneOpt();
-        if (opt.isEmpty()) {
-            return null;
-        }
+//        if (opt.isEmpty()) {
+//            return null;
+//        }
+        Assert.isFalse(opt.isEmpty(), "opt is Empty.tgId={}",
+                JSONObject.toJSONString(tgId));
+
         BoolUser boolUser = opt.get();
         UserVo userVo = new UserVo();
 
@@ -492,9 +506,14 @@ public class UserService {
         Long userTgId = checkUserResult.getLong("id");
         Assert.notNull(userTgId, "User identity parsing failed.");
 
-        UserVo userInfo = getUserInfo(userTgId);
-        updateUserInfo(userInfo, checkUserResult);
-        return userInfo;
+        try {
+            UserVo userInfo = getUserInfo(userTgId);
+            updateUserInfo(userInfo, checkUserResult);
+            return userInfo;
+        } catch (Exception e) {
+            log.error("Get user info error:[{}]", e.getMessage());
+            return null;
+        }
     }
 
     private void updateUserInfo(UserVo userVo, JSONObject checkUserResult) {

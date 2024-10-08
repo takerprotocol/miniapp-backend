@@ -93,6 +93,6 @@ public class BoolUserPrivateKeyFragmentInfo extends BaseSqlDO {
         this.privateKey1Fragment = privateKey1Fragment;
         this.privateKey2Fragment = privateKey2Fragment;
         this.privateKey3Fragment = privateKey3Fragment;
-        this.uploadTime = LocalDateTime.now();
+//        this.uploadTime = LocalDateTime.now();
     }
 }

@@ -36,6 +36,6 @@ public class BoolUserInvitationRelation extends BaseSqlDO {
     /**
      * 交易哈希
      */
-    @TableField("tx_hash")
-    private String txHash;
+//    @TableField("tx_hash")
+//    private String txHash;
 }

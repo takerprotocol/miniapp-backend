@@ -78,4 +78,10 @@ bool:
     l2-ratio: 0.03
   create-task:
     enable: true
-    key-set: "creat-task-1"
+    key-set: ["creat-task-1"]
+rank:
+  task:
+    switch: open
+    invite:
+      settle:
+        cron: 0 15 8 ? * MON

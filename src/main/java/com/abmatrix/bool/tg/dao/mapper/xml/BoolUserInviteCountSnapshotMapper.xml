@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+        namespace="com.abmatrix.bool.tg.dao.mapper.BoolUserInviteCountSnapshotMapper">
+
+<!--    <resultMap-->
+<!--            id="userInviteCountSnapshotResultMap"-->
+<!--            type="com.abmatrix.bool.tg.dao.entity.BoolUserInviteCountSnapshot">-->
+<!--        <id-->
+<!--                property="id"-->
+<!--                column="id" />-->
+<!--        <result-->
+<!--                property="version"-->
+<!--                column="version" />-->
+<!--        <result-->
+<!--                property="createTime"-->
+<!--                column="create_time" />-->
+<!--        <result-->
+<!--                property="updateTime"-->
+<!--                column="update_time" />-->
+<!--        <result-->
+<!--                property="createUser"-->
+<!--                column="create_user" />-->
+<!--        <result-->
+<!--                property="updateUser"-->
+<!--                column="update_user" />-->
+<!--        <result-->
+<!--                property="userId"-->
+<!--                column="f_user_id" />-->
+<!--        <result-->
+<!--                property="amount"-->
+<!--                column="f_amount" />-->
+<!--        <result-->
+<!--                property="amount1"-->
+<!--                column="f_amount_1" />-->
+<!--        <result-->
+<!--                property="amount2"-->
+<!--                column="f_amount_2" />-->
+<!--    </resultMap>-->
+
+
+
+
+
+
+
+    <insert
+            id="batchSaveUserInviteCountForFull"
+            parameterType="java.util.List">
+        <foreach
+                collection="list"
+                item="snap"
+                index="index"
+                separator=";">
+            insert into bool_user_invite_count_snapshot
+                (create_user,update_user,f_user_id,f_amount,f_amount_1,f_amount_2)
+            values (
+                #{snap.createUser},
+                #{snap.updateUser},
+                #{snap.userId},
+                #{snap.amount},
+                #{snap.amount1},
+                #{snap.amount2}
+            )
+            ON DUPLICATE KEY
+            UPDATE
+            f_amount =
+            VALUES(f_amount),
+            f_amount_1 = VALUES(f_amount_1),
+            f_amount_2 =
+            VALUES(f_amount_2)
+        </foreach>
+    </insert>
+    <insert
+            id="batchSaveUserInviteCountForIncrease"
+            parameterType="java.util.List">
+        <foreach
+                collection="list"
+                item="snap"
+                index="index"
+                separator=";">
+            INSERT INTO bool_user_invite_count_snapshot
+            (
+            create_user,
+            update_user,
+            f_user_id,
+            f_amount,
+            f_amount_1,
+            f_amount_2
+            )
+            VALUES (
+            #{snap.createUser},
+            #{snap.updateUser},
+            #{snap.userId},
+            f_amount+#{snap.amount},
+            f_amount_1+#{snap.amount1},
+            f_amount_2+#{snap.amount2}
+            )
+            ON DUPLICATE KEY
+            UPDATE
+            f_amount =
+            f_amount+VALUES(f_amount),
+            f_amount_1 = f_amount_1+VALUES(f_amount_1),
+            f_amount_2 =
+            f_amount_2+VALUES(f_amount_2)
+        </foreach>
+    </insert>
+
+
+
+    <select
+            id="queryTop500Full"
+            resultType="com.abmatrix.bool.tg.model.resp.UserInviteRankResp">
+        SELECT
+        t1.f_user_id AS userId,
+        t1.f_amount AS amount,
+        t1.f_amount_1 AS
+        amount1,
+        t1.f_amount_2 AS amount2,
+        t2.username AS
+        userName,
+        t2.is_verify
+        AS verify,
+        t3.f_value as personalUrl
+        from
+        bool_user_invite_count_snapshot t1
+        left join bool_user_user t2 on
+        t1.f_user_id =t2.id
+        left join bool_user_custom_info t3
+        on t1.f_user_id
+        =t3.f_user_id and t3.f_type =1
+        where t1.f_amount >0
+        <if test="verified != null">
+            and
+            t2.is_verify
+            =#{verified}
+        </if>
+        order by
+        t1.f_amount desc limit
+        500
+    </select>
+</mapper>

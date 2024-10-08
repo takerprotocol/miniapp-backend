@@ -30,6 +30,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
@@ -71,6 +72,7 @@ public class RankTask implements CommandLineRunner {
      * 缓存接口
      */
     @Autowired
+    @Qualifier("boolRedisTemplate")
     private RedisTemplate<String, Object> fastJsonRedisTemplate;
     /**
      * 用户奖励接口

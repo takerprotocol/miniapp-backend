@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+        namespace="com.abmatrix.bool.tg.dao.mapper.BoolUserInviteCountWeekSnapshotMapper">
+    <insert
+            id="batchSaveInviteCountWeekSnapshotForFull"
+            parameterType="java.util.List">
+        <foreach
+                collection="list"
+                item="snap"
+                index="index"
+                separator=";">
+            INSERT INTO bool_user_invite_count_week_snapshot
+            (
+            create_user,
+            update_user,
+            f_user_id,
+            f_amount,
+            f_amount_1,
+            f_amount_2,
+            f_caculate_timestamp,
+            f_latest_invitation_timestamp
+            )
+            VALUES (
+            #{snap.createUser},
+            #{snap.updateUser},
+            #{snap.userId},
+            #{snap.amount},
+            #{snap.amount1},
+            #{snap.amount2},
+            #{snap.caculateTimestamp},
+            #{snap.latestInvitationTimestamp}
+            )
+            ON DUPLICATE KEY
+            UPDATE
+            f_amount =
+            VALUES(f_amount),
+            f_amount_1 = VALUES(f_amount_1),
+            f_amount_2 =
+            VALUES(f_amount_2),
+            f_latest_invitation_timestamp=VALUES(f_latest_invitation_timestamp)
+        </foreach>
+    </insert>
+    <select
+            id="queryTop500Week"
+            resultType="com.abmatrix.bool.tg.model.resp.UserInviteRankResp">
+        SELECT
+        t1.id AS snapId,
+        t1.f_user_id AS userId,
+        t1.f_amount AS amount,
+        t1.f_amount_1 AS
+        amount1,
+        t1.f_amount_2 AS amount2,
+        t1.f_latest_invitation_timestamp AS
+        latestInvitationTimestamp,
+        t2.username AS
+        userName,
+        t2.is_verify
+        AS
+        verify,
+        t3.f_value as personalUrl
+        from
+        bool_user_invite_count_week_snapshot t1
+        left join bool_user_user t2 on
+        t1.f_user_id =t2.id
+        left join bool_user_custom_info t3
+        on t1.f_user_id
+        =t3.f_user_id and t3.f_type =1
+        where
+        t1.f_caculate_timestamp
+        =#{timestamp}
+        and t1.f_amount >0
+        <if test="verified != null">
+            and
+            t2.is_verify
+            =#{verified}
+        </if>
+        order by
+        t1.f_amount desc,t1.f_latest_invitation_timestamp asc,
+        t1.f_amount_1 desc
+        limit 500
+    </select>
+</mapper>

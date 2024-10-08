@@ -5,7 +5,8 @@
 		id="pageRank"
 		resultType="com.abmatrix.bool.tg.common.model.vo.UserRankVo">
 		select
-		t1.username,t2.rewardValue,t1.is_verify,t1.id userId
+-- 		t1.username,t2.rewardValue,t1.is_verify,t1.id userId
+		t1.username,t2.rewardValue,t1.id userId
 		from
 		bool_user_user t1
 		inner

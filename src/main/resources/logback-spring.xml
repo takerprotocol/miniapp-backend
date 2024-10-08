@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration scan="true" scanPeriod="60 seconds" debug="false">
-    <property name="log.path" value="/Users/howie/tg/log" />
-<!--    <property name="log.path" value="/home/ubuntu/data/taker/tg-log" />-->
+    <property name="log.path" value="/home/ubuntu/data/taker/tg-log" />
     <property name="log.pattern" value="%d{HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n"/>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
