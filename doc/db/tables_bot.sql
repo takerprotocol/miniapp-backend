@@ -337,4 +337,26 @@ CREATE TABLE `bool_user_user` (
 BEGIN;
 COMMIT;
 
+-- ----------------------------
+-- Table structure for bool_user_invite_count_week_snapshot
+-- ----------------------------
+DROP TABLE IF EXISTS `bool_user_invite_count_week_snapshot`;
+CREATE TABLE `bool_user_invite_count_week_snapshot` (
+                                                        `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',
+                                                        `version` bigint(20) NOT NULL DEFAULT '0' COMMENT '版本号',
+                                                        `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                                        `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间',
+                                                        `create_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '创建人',
+                                                        `update_user` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '修改人',
+                                                        `f_user_id` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID',
+                                                        `f_amount` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '邀请人数量1级+2级',
+                                                        `f_caculate_timestamp` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '业务时间',
+                                                        `f_amount_1` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '一级邀请人数',
+                                                        `f_amount_2` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '二级邀请人数',
+                                                        `f_latest_invitation_timestamp` bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '最晚达标时间记录',
+                                                        PRIMARY KEY (`id`),
+                                                        UNIQUE KEY `uniq_time_user` (`f_caculate_timestamp`,`f_user_id`),
+                                                        KEY `idx_sort_1` (`f_caculate_timestamp`,`f_amount`,`f_latest_invitation_timestamp`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=85809350 DEFAULT CHARSET=utf8mb4 COMMENT='用户邀请数量周维度快照表';
+
 SET FOREIGN_KEY_CHECKS = 1;
