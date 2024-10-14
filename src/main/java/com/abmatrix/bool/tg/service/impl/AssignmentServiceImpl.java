@@ -1,6 +1,7 @@
 package com.abmatrix.bool.tg.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
@@ -331,20 +332,46 @@ public class AssignmentServiceImpl implements AssignmentService {
             // 组装奖励发放表
             BoolAssignment assignment = boolAssignmentMapper.selectById(assignmentId);
             Assert.notNull(assignment, "The corresponding task does not exist.");
-            // 判断是否其实已经完成该任务
-            LambdaQueryWrapper<BoolAssignmentUserRelation> relationQuery = Wrappers.lambdaQuery();
-            relationQuery.eq(BoolAssignmentUserRelation::getAssignmentId, assignmentId);
-            relationQuery.eq(BoolAssignmentUserRelation::getUserId, userId);
-            relationQuery.select(BoolAssignmentUserRelation::getId);
-            relationQuery.last(" LIMIT 1 ");
-            BoolAssignmentUserRelation existRelation = boolAssignmentUserRelationMapper.selectOne(relationQuery,
-                    Boolean.FALSE);
-            if (existRelation != null) {
-                log.warn("当前用户该任务已完成userId={},assignmentId={}", userId, assignmentId);
-                result = ResultVo.success(Boolean.TRUE);
-                return result;
-            }
+
             AssignmentTypeEnum type = assignment.getAssignmentType();
+
+            // 判断是否其实已经完成该任务，分为两种类别的活动，一次性活动 和 每日一次性活动
+            BoolAssignmentUserRelation existRelation = null;
+
+            // 当前任务类型为 每日任务
+            if (type == AssignmentTypeEnum.DAILY) {
+                // 判断是否其实已经完成该任务
+                LambdaQueryWrapper<BoolAssignmentUserRelation> relationQuery = Wrappers.lambdaQuery();
+                relationQuery.eq(BoolAssignmentUserRelation::getAssignmentId, assignmentId);
+                relationQuery.eq(BoolAssignmentUserRelation::getUserId, userId);
+                relationQuery.orderByDesc(BoolAssignmentUserRelation::getCreateTime);
+                relationQuery.select(BoolAssignmentUserRelation::getCreateTime);
+                relationQuery.last(" LIMIT 1 ");
+                existRelation = boolAssignmentUserRelationMapper.selectOne(relationQuery,
+                        Boolean.FALSE);
+                if (existRelation != null) {
+                    LocalDateTime createTime = existRelation.getCreateTime();
+                    Duration duration = Duration.between(createTime, DateTime.now().toLocalDateTime());
+                    if (duration.compareTo(Duration.ofDays(1)) <= NumberConstants.ZERO) {
+                        log.warn("当前用户已完成每日活动，该任务已完成userId={},assignmentId={}", userId, assignmentId);
+                        result = ResultVo.success(Boolean.TRUE);
+                        return result;
+                    }
+                }
+            } else {
+                LambdaQueryWrapper<BoolAssignmentUserRelation> relationQuery = Wrappers.lambdaQuery();
+                relationQuery.eq(BoolAssignmentUserRelation::getAssignmentId, assignmentId);
+                relationQuery.eq(BoolAssignmentUserRelation::getUserId, userId);
+                relationQuery.select(BoolAssignmentUserRelation::getId);
+                relationQuery.last(" LIMIT 1 ");
+                existRelation = boolAssignmentUserRelationMapper.selectOne(relationQuery,
+                        Boolean.FALSE);
+                if (existRelation != null) {
+                    log.warn("当前用户该任务已完成userId={},assignmentId={}", userId, assignmentId);
+                    result = ResultVo.success(Boolean.TRUE);
+                    return result;
+                }
+            }
 
             // 组装完成任务表
             BoolAssignmentUserRelation relation = new BoolAssignmentUserRelation();
@@ -390,6 +417,10 @@ public class AssignmentServiceImpl implements AssignmentService {
                 }
                 case BOOST: {
                     rewardRecord.setType(RewardType.JOIN_COMMUNITY);
+                    break;
+                }
+                case DAILY: {
+                    rewardRecord.setType(RewardType.DAILY_TASK);
                     break;
                 }
                 default:

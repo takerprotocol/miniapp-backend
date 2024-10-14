@@ -11,6 +11,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -50,6 +51,20 @@ public class UserController {
         ).subscribeOn(Schedulers.boundedElastic());
 
     }
+
+
+    /**
+     * 查询用户 join group channel
+     * @param req
+     * @return
+     */
+    @PostMapping("/user/chat/member")
+    public Mono<ResultVo<ChatMember>> getChatMember(@RequestBody UserInfoReq req) {
+        return Mono.fromCallable(
+                () -> ResultVo.success(userService.getChatMember(req))
+        ).subscribeOn(Schedulers.boundedElastic());
+    }
+
 
     /**
      * 查询邀请记录

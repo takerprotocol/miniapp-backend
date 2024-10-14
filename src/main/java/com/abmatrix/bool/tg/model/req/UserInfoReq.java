@@ -27,4 +27,11 @@ public class UserInfoReq implements Serializable {
 	 * 头像地址
 	 */
 	private String photoUrl;
+
+
+	/**
+	 * 聊天id
+	 */
+	private String chatId;
+
 }

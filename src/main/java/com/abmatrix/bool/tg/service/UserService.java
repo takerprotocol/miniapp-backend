@@ -27,6 +27,7 @@ import com.abmatrix.bool.tg.dao.service.IUserService;
 import com.abmatrix.bool.tg.middleware.redis.clients.ListRedisClient;
 import com.abmatrix.bool.tg.middleware.redis.clients.SetRedisClient;
 import com.abmatrix.bool.tg.middleware.redis.clients.SimpleRedisClient;
+import com.abmatrix.bool.tg.middleware.telegram.BoolFamilyBot;
 import com.abmatrix.bool.tg.model.req.UserInfoReq;
 import com.abmatrix.bool.tg.model.req.UserRegisterReq;
 import com.alibaba.fastjson2.JSON;
@@ -41,6 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.telegram.telegrambots.meta.api.objects.chatmember.ChatMember;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -117,6 +119,9 @@ public class UserService {
     private RedissonClient redissonClient;
     @Resource
     private UserInvitationRelationMapper userInvitationRelationMapper;
+
+    @Resource
+    private BoolFamilyBot boolFamilyBot;
 
 
     @SneakyThrows
@@ -530,6 +535,28 @@ public class UserService {
         }
 
         userServiceAdaptor.updateUsername(username, userVo.getUserId());
+    }
+
+    /**
+     * 查询用户 join group channel
+     * @param req
+     * @return
+     */
+    public ChatMember getChatMember(UserInfoReq req) {
+        String hash = req.getHash();
+        Assert.notBlank(hash, "Identity identifier missing.");
+
+        String data = req.getData();
+        Assert.notBlank(data, "Identity identifier missing.");
+
+        JSONObject checkUserResult = checkAndParseData(data, hash);
+        Assert.isFalse(checkUserResult.isEmpty(), "User identity verification failed.req={}",
+                JSONObject.toJSONString(req));
+        Long userTgId = checkUserResult.getLong("id");
+        Assert.notNull(userTgId, "User identity parsing failed.");
+
+        ChatMember chatMember = boolFamilyBot.getChatMember(req.getChatId(), userTgId);
+        return chatMember;
     }
 
 }
