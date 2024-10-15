@@ -18,7 +18,7 @@
             f_amount,
             f_amount_1,
             f_amount_2,
-            f_caculate_timestamp,
+            f_calculate_timestamp,
             f_latest_invitation_timestamp
             )
             VALUES (
@@ -28,7 +28,7 @@
             #{snap.amount},
             #{snap.amount1},
             #{snap.amount2},
-            #{snap.caculateTimestamp},
+            #{snap.calculateTimestamp},
             #{snap.latestInvitationTimestamp}
             )
             ON DUPLICATE KEY
@@ -67,7 +67,7 @@
         on t1.f_user_id
         =t3.f_user_id and t3.f_type =1
         where
-        t1.f_caculate_timestamp
+        t1.f_calculate_timestamp
         =#{timestamp}
         and t1.f_amount >0
         <if test="verified != null">

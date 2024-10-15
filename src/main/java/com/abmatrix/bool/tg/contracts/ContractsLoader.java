@@ -72,7 +72,7 @@ public class ContractsLoader<T extends Contract> {
      */
     @PostConstruct
     private void init() {
-        loadAndRegistStakeContract();
+//        loadAndRegistStakeContract();
     }
 
     /**
