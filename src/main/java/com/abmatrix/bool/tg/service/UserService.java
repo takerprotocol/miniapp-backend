@@ -470,7 +470,9 @@ public class UserService {
 
         userVo.setRewardMap(rewardMap);
         userVo.setInviterCount(inviterCount);
-        userVo.setRank(userDao.getUserRank(userId));
+        String userRank = userDao.getUserRank(userId);
+        log.info("userId={},userRank={}", userId, userRank);
+        userVo.setRank(userRank);
 
         // 返回值新增个人链接
         LambdaQueryWrapper<BoolUserCustomInfo> customInfoQuery = Wrappers.lambdaQuery();
@@ -484,11 +486,11 @@ public class UserService {
             userVo.setPersonalUrl(existCustomInfo.getPersonalInfoValue());
         }
 
-        try {
-            simpleRedisClient.set(key, userVo, 30, TimeUnit.SECONDS);
-        } catch (Exception e) {
-            simpleRedisClient.set(key, userVo, 30, TimeUnit.SECONDS);
-        }
+//        try {
+////            simpleRedisClient.set(key, userVo, 30, TimeUnit.SECONDS);
+//        } catch (Exception e) {
+////            simpleRedisClient.set(key, userVo, 30, TimeUnit.SECONDS);
+//        }
         return userVo;
     }
 

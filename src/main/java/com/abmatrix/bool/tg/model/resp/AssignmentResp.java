@@ -64,7 +64,7 @@ public class AssignmentResp implements Serializable {
 	/**
 	 * 完成时间
 	 */
-	private LocalDateTime completeTime;
+	private String completeTime;
 	/**
 	 * 排序编号
 	 */

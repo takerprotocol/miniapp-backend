@@ -266,32 +266,35 @@ public class InviteServiceImpl implements InviteService {
 			return result;
 		}
 		long offset = PageUtil.getStart(pageNo - 1, pageSize);
-		Set<Object> rankUserSimpleRespSet = zsetRedisClient.range(RedisKeyConstants.USER_POINT_RANK_ZSET_KEY, offset,
-				offset + pageSize);
+//		Set<Object> rankUserSimpleRespSet = zsetRedisClient.range(RedisKeyConstants.USER_POINT_RANK_ZSET_KEY, offset,
+//				offset + pageSize);
 		List<UserRankVo> rankList = Lists.newArrayList();
-		if (CollectionUtil.isNotEmpty(rankUserSimpleRespSet)) {
-			for (Object rankUserSimpleRespObj : rankUserSimpleRespSet) {
-				String simpleRespJson = JSONObject.toJSONString(rankUserSimpleRespObj);
-				UserRankSimpleResp simpleResp = JSONObject.parseObject(simpleRespJson, UserRankSimpleResp.class);
-				UserRankVo rank = new UserRankVo();
-				rank.setUserId(simpleResp.getUserId());
-				rank.setRewardValue(simpleResp.getRewardValue());
-				rank.setUsername(simpleResp.getUsername());
-				rankList.add(rank);
-			}
-			CollectionUtil.sort(rankList, (r1, r2) -> {
-				String rvStr1 = r1.getRewardValue();
-				String rvStr2 = r2.getRewardValue();
-				if (StringUtils.equalsIgnoreCase(rvStr1, rvStr2)) {
-					return NumberConstants.ZERO;
-				}
-				BigDecimal rv1 = new BigDecimal(rvStr1);
-				BigDecimal rv2 = new BigDecimal(rvStr2);
-				return rv2.compareTo(rv1);
-			});
-		} else {
-			rankList = rankMapper.pageRank(offset, (long) pageSize);
-		}
+//		if (CollectionUtil.isNotEmpty(rankUserSimpleRespSet)) {
+//			for (Object rankUserSimpleRespObj : rankUserSimpleRespSet) {
+//				String simpleRespJson = JSONObject.toJSONString(rankUserSimpleRespObj);
+//				UserRankSimpleResp simpleResp = JSONObject.parseObject(simpleRespJson, UserRankSimpleResp.class);
+//				UserRankVo rank = new UserRankVo();
+//				rank.setUserId(simpleResp.getUserId());
+//				rank.setRewardValue(simpleResp.getRewardValue());
+//				rank.setUsername(simpleResp.getUsername());
+//				rankList.add(rank);
+//			}
+//			CollectionUtil.sort(rankList, (r1, r2) -> {
+//				String rvStr1 = r1.getRewardValue();
+//				String rvStr2 = r2.getRewardValue();
+//				if (StringUtils.equalsIgnoreCase(rvStr1, rvStr2)) {
+//					return NumberConstants.ZERO;
+//				}
+//				BigDecimal rv1 = new BigDecimal(rvStr1);
+//				BigDecimal rv2 = new BigDecimal(rvStr2);
+//				return rv2.compareTo(rv1);
+//			});
+//		} else {
+//			rankList = rankMapper.pageRank(offset, (long) pageSize);
+//		}
+
+		rankList = rankMapper.pageRank(offset, (long) pageSize);
+
 		AtomicInteger rankAtom = new AtomicInteger(NumberConstants.ZERO);
 		Integer pageNoCacl = pageNo;
 		Integer pageSizeCacl = pageNo;
@@ -349,11 +352,14 @@ public class InviteServiceImpl implements InviteService {
 //		} else {
 //			pages = 500 / pageSize + 1;
 //		}
+
+
 		result.setPages(1);
-		try {
-			simpleRedisClient.set(key, result, 30, TimeUnit.SECONDS);
-		} catch (Exception e) {
-		}
+
+//		try {
+//			simpleRedisClient.set(key, result, 30, TimeUnit.SECONDS);
+//		} catch (Exception e) {
+//		}
 		return result;
 	}
 

@@ -1,7 +1,9 @@
 package com.abmatrix.bool.tg.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.IdUtil;
@@ -198,12 +200,17 @@ public class AssignmentServiceImpl implements AssignmentService {
         LambdaQueryWrapper<BoolAssignmentUserRelation> relationQuery = Wrappers.lambdaQuery();
         relationQuery.eq(BoolAssignmentUserRelation::getUserId, userId);
         relationQuery.select(BoolAssignmentUserRelation::getUserId, BoolAssignmentUserRelation::getAssignmentId,
-                BoolAssignmentUserRelation::getCreateTime);
-        List<BoolAssignmentUserRelation> relationList = boolAssignmentUserRelationMapper.selectList(relationQuery);
+                BoolAssignmentUserRelation::getUpdateTime);
+
+        List<BoolAssignmentUserRelation> relationList = boolAssignmentUserRelationMapper
+                .selectList(relationQuery);
+
         Map<Long, Long> relationMap = relationList.stream().collect(
                 Collectors.toMap(BoolAssignmentUserRelation::getAssignmentId, BoolAssignmentUserRelation::getUserId));
+
         Map<Long, LocalDateTime> compeleteTimeMap = relationList.stream().collect(Collectors
-                .toMap(BoolAssignmentUserRelation::getAssignmentId, BoolAssignmentUserRelation::getCreateTime));
+                .toMap(BoolAssignmentUserRelation::getAssignmentId, BoolAssignmentUserRelation::getUpdateTime));
+
         String boolProject = "bool";
         LocalDateTime now = LocalDateTime.now();
         return list.stream().map(assignment -> {
@@ -214,13 +221,38 @@ public class AssignmentServiceImpl implements AssignmentService {
             resp.setDescribe(assignment.getAssignmentDesc());
             resp.setUrl(assignment.getUrl());
             resp.setSort(assignment.getSortField());
-            Long doneUserId = relationMap.get(assignmentId);
-            Boolean done = doneUserId != null;
+
+            Boolean done = Boolean.FALSE;
+            AssignmentTypeEnum assignmentType = assignment.getAssignmentType();
+            if (assignmentType.equals(AssignmentTypeEnum.DAILY)) {
+                done = Boolean.FALSE;
+                // 每日任务需要判断是否完成
+                LocalDateTime localDateTime1 = compeleteTimeMap.get(assignmentId);
+                if (localDateTime1 != null) {
+                    Duration duration = Duration.between(localDateTime1, now);
+                    // 判断是否完成 上次完成时间距离现在的时间，如果小于一天，则任务完成
+                    if (duration.compareTo(Duration.ofDays(1)) <= NumberConstants.ZERO) {
+                        done = Boolean.TRUE;
+                    } else {
+                        // 超过一天了，则任务未完成，可以重新领取
+                        done = Boolean.FALSE;
+                    }
+                }
+            } else {
+                Long doneUserId = relationMap.get(assignmentId);
+                if (doneUserId != null) {
+                    done = Boolean.TRUE;
+                }
+            }
+
             resp.setDone(done);
             if (done) {
                 LocalDateTime compeleteTime = compeleteTimeMap.get(assignmentId);
-                resp.setCompleteTime(compeleteTime);
+                resp.setCompleteTime(LocalDateTimeUtil.format(compeleteTime, "yyyy-MM-dd HH:mm:ss"));
+            } else {
+                resp.setCompleteTime(null);
             }
+
             BigDecimal reward = assignment.getRewardValue();
             if (reward != null) {
                 reward = reward.stripTrailingZeros();
@@ -255,23 +287,30 @@ public class AssignmentServiceImpl implements AssignmentService {
             resp.setTimestamp(timeStamp);
             return resp;
         }).filter(resp -> {
-            String project = resp.getProject();
-            if (StringUtils.equalsIgnoreCase(boolProject, project)) {
-                return Boolean.TRUE;
-            }
-            LocalDateTime compelteTime = resp.getCompleteTime();
-            if (compelteTime == null) {
-                return Boolean.TRUE;
-            }
-            Boolean done = resp.getDone();
-            if (!done) {
-                return Boolean.TRUE;
-            }
-            Duration duration = Duration.between(compelteTime, now);
-            if (duration.compareTo(Duration.ofHours(1)) > NumberConstants.ZERO) {
-                return Boolean.FALSE;
-            }
-            resp.setCompleteTime(null);
+//            String project = resp.getProject();
+//            if (StringUtils.equalsIgnoreCase(boolProject, project)) {
+//                return Boolean.TRUE;
+//            }
+//            LocalDateTime compelteTime = resp.getCompleteTime();
+//            if (compelteTime == null) {
+//                return Boolean.TRUE;
+//            }
+//            Boolean done = resp.getDone();
+//            if (!done) {
+//                return Boolean.TRUE;
+//            }
+//            Duration duration = Duration.between(compelteTime, now);
+//            if (duration.compareTo(Duration.ofHours(1)) > NumberConstants.ZERO) {
+//                return Boolean.FALSE;
+//            }
+
+//            Duration duration = Duration.between(compelteTime, now);
+//            if (duration.compareTo(Duration.ofDays(1)) <= NumberConstants.ZERO) {
+//                return Boolean.FALSE;
+//            }
+//
+//
+//            resp.setCompleteTime(null);
             return Boolean.TRUE;
         }).collect(Collectors.toList());
     }
@@ -344,13 +383,13 @@ public class AssignmentServiceImpl implements AssignmentService {
                 LambdaQueryWrapper<BoolAssignmentUserRelation> relationQuery = Wrappers.lambdaQuery();
                 relationQuery.eq(BoolAssignmentUserRelation::getAssignmentId, assignmentId);
                 relationQuery.eq(BoolAssignmentUserRelation::getUserId, userId);
-                relationQuery.orderByDesc(BoolAssignmentUserRelation::getCreateTime);
-                relationQuery.select(BoolAssignmentUserRelation::getCreateTime);
+                relationQuery.orderByDesc(BoolAssignmentUserRelation::getUpdateTime);
+                relationQuery.select(BoolAssignmentUserRelation::getUpdateTime);
                 relationQuery.last(" LIMIT 1 ");
                 existRelation = boolAssignmentUserRelationMapper.selectOne(relationQuery,
                         Boolean.FALSE);
                 if (existRelation != null) {
-                    LocalDateTime createTime = existRelation.getCreateTime();
+                    LocalDateTime createTime = existRelation.getUpdateTime();
                     Duration duration = Duration.between(createTime, DateTime.now().toLocalDateTime());
                     if (duration.compareTo(Duration.ofDays(1)) <= NumberConstants.ZERO) {
                         log.warn("当前用户已完成每日活动，该任务已完成userId={},assignmentId={}", userId, assignmentId);
